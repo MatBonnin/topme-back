@@ -1,0 +1,109 @@
+@base_url = http://localhost:3000
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczNDQ1NzksImV4cCI6MTc0NzM0ODE3OX0.qetbApkqJCfM_4KKaPhQidMHqtFJcEH347hajYcMQhA
+
+@item_id = 67890
+
+@list_id = 8e27be22-01ff-4542-a11c-38de95b83bb4
+
+###  
+# 1) Inscription
+POST {{base_url}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "mathieu@example.com",
+  "username": "mathieu23",
+  "password": "MonSuperMdp!"
+}
+
+###  
+# 2) Login
+POST {{base_url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "mathieu@example.com",
+  "password": "MonSuperMdp!"
+}
+
+###  
+# On récupère le token automatiquement
+> {% 
+    const json = JSON.parse(response.body);
+    client.global.set("token", json.access_token);
+%}
+
+###  
+# 3) Récupérer le profil
+GET {{base_url}}/users/me
+Authorization: Bearer {{token}}
+
+###  
+# 4) Créer un Top (List)
+POST {{base_url}}/lists
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Top 5 Films",
+  "category": "films"
+}
+
+###  
+# 5) Lister tous mes Tops
+GET {{base_url}}/lists
+Authorization: Bearer {{token}}
+
+###  
+# 6) Récupérer un Top précis (remplace list_id)
+
+
+GET {{base_url}}/lists/{{list_id}}
+Authorization: Bearer {{token}}
+
+###  
+# 7) Mettre à jour un Top
+PATCH {{base_url}}/lists/{{list_id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Top 5 Films Cultes"
+}
+
+###  
+# 8) Supprimer un Top
+DELETE {{base_url}}/lists/{{list_id}}
+Authorization: Bearer {{token}}
+
+###  
+# 9) Ajouter un Item à un Top
+POST {{base_url}}/lists/{{list_id}}/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Inception",
+  "rank": 1
+}
+
+###  
+# 10) Lister les Items d’un Top
+GET {{base_url}}/lists/{{list_id}}/items
+Authorization: Bearer {{token}}
+
+###  
+# 11) Mettre à jour un Item
+
+PATCH {{base_url}}/lists/{{list_id}}/items/{{item_id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rank": 2
+}
+
+###  
+# 12) Supprimer un Item
+DELETE {{base_url}}/lists/{{list_id}}/items/{{item_id}}
+Authorization: Bearer {{token}}
