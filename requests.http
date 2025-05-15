@@ -1,9 +1,9 @@
 @base_url = http://localhost:3000
 @token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczNDQ1NzksImV4cCI6MTc0NzM0ODE3OX0.qetbApkqJCfM_4KKaPhQidMHqtFJcEH347hajYcMQhA
 
-@item_id = 67890
+@item_id = 19275c24-7375-4336-bd6d-91de971990c4
 
-@list_id = 8e27be22-01ff-4542-a11c-38de95b83bb4
+@list_id = 5418022d-8a50-4dd3-bc05-de233110a2b6
 
 ###  
 # 1) Inscription
@@ -83,8 +83,8 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "Inception",
-  "rank": 1
+  "name": "apple",
+  "rank": 3
 }
 
 ###  
