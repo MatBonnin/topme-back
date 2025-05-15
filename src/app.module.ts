@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ListsModule } from './lists/lists.module';
 import { ItemsModule } from './items/items.module';
+import { LookupModule } from './lookup/lookup.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ItemsModule } from './items/items.module';
     AuthModule,
     ListsModule,
     ItemsModule,
+    LookupModule,
   ],
   controllers: [AppController],
   providers: [AppService],

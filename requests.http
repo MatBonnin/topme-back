@@ -107,3 +107,9 @@ Content-Type: application/json
 # 12) Supprimer un Item
 DELETE {{base_url}}/lists/{{list_id}}/items/{{item_id}}
 Authorization: Bearer {{token}}
+
+
+=
+
+### Recherche image Unsplash
+GET {{base_url}}/lookup?q=apple
