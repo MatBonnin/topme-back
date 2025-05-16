@@ -10,7 +10,11 @@ export class Category {
   id: string;
 
   @Column({ unique: true })
-  name: string;    // “films”, “food”, “cars”, “colors”, etc.
+  name: string;
+
+  // Nouvel attribut pour l’URL de l’image
+  @Column({ nullable: true })
+  imageUrl?: string;
 
   @OneToMany(() => List, list => list.category)
   lists: List[];

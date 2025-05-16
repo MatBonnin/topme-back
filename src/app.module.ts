@@ -1,37 +1,68 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
+// src/app.module.ts
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { ListsModule } from './lists/lists.module';
-import { ItemsModule } from './items/items.module';
-import { LookupModule } from './lookup/lookup.module';
-import { CategoriesModule } from './categories/categories.module';
+import { Module, OnModuleInit }      from '@nestjs/common';
+
+import { AuthModule }                from './auth/auth.module';
+import { CategoriesModule }          from './categories/categories.module';
+import { CategoriesService }         from './categories/categories.service';
+import { Category }                  from './categories/category.entity';
+import { ConfigModule }              from '@nestjs/config';
+import { ItemsModule }               from './items/items.module';
+import { ListsModule }               from './lists/lists.module';
+import { LookupModule }              from './lookup/lookup.module';
+import { ServeStaticModule }         from '@nestjs/serve-static';
+import { TypeOrmModule }             from '@nestjs/typeorm';
+import { UsersModule }               from './users/users.module';
+import { join }                      from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (cfg: ConfigService) => ({
-        type: 'postgres',
-        url: cfg.get<string>('DATABASE_URL'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // à désactiver en prod
-      }),
-      inject: [ConfigService],
+
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/static',
     }),
-    UsersModule,
+
+    TypeOrmModule.forRootAsync({
+      useFactory: () => ({
+        type: 'postgres',
+        url: process.env.DATABASE_URL,
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: true,
+      }),
+    }),
+
     AuthModule,
+    UsersModule,
+    CategoriesModule,
     ListsModule,
     ItemsModule,
     LookupModule,
-    CategoriesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  // Pas besoin de providers ici, on utilisera CategoriesService
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(
+    private readonly categoriesService: CategoriesService,
+  ) {}
+
+  async onModuleInit() {
+    const defaults = [
+      { name: 'films',  imageUrl: '/static/images/categories/films.png' },
+      { name: 'food',   imageUrl: '/static/images/categories/food.png'  },
+      { name: 'cars',   imageUrl: '/static/images/categories/cars.png'  },
+      { name: 'colors', imageUrl: '/static/images/categories/colors.png'},
+    ];
+
+    for (const { name, imageUrl } of defaults) {
+      // catégorie existante ou création via service
+      const exists = await this.categoriesService.findAll()
+        .then(list => list.find(c => c.name === name));
+
+      if (!exists) {
+        await this.categoriesService.create({ name, imageUrl });
+      }
+    }
+  }
+}

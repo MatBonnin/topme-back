@@ -1,9 +1,12 @@
+// src/auth/auth.service.ts
+
 import * as bcrypt from 'bcrypt';
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
+import { QueryFailedError } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -16,23 +19,30 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<User> {
-    // TODO : vérifier que l'email n'existe pas déjà
-    return this.usersService.create(dto.email, dto.username, dto.password);
+    try {
+      return await this.usersService.create(dto.email, dto.username, dto.password);
+    } catch (err: any) {
+      // TypeORM lance une QueryFailedError pour la contrainte unique
+      if (err instanceof QueryFailedError && err.driverError.code === '23505') {
+        // détail du err.driverError.detail = 'La clé « (email)=(...) » existe déjà.'
+        throw new ConflictException('Email déjà utilisé');
+      }
+      // sinon on remonte
+      throw err;
+    }
   }
 
   async validateUser(email: string, pass: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
-    if (!user) throw new UnauthorizedException();
+    if (!user) throw new UnauthorizedException('Identifiants invalides');
     const valid = await bcrypt.compare(pass, user.passwordHash);
-    if (!valid) throw new UnauthorizedException();
+    if (!valid) throw new UnauthorizedException('Identifiants invalides');
     return user;
   }
 
   async login(dto: LoginDto) {
     const user = await this.validateUser(dto.email, dto.password);
     const payload = { sub: user.id, email: user.email };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    return { access_token: this.jwtService.sign(payload), user };
   }
 }

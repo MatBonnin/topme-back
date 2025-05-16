@@ -1,4 +1,5 @@
 // src/auth/auth.controller.ts
+
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -10,6 +11,7 @@ export class AuthController {
 
   @Post('register')
   register(@Body() dto: RegisterDto) {
+    // si ConflictException est levée, Nest renvoie 409
     return this.authService.register(dto);
   }
 

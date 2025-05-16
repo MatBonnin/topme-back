@@ -1,5 +1,5 @@
-@base_url = http://localhost:3000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczNzc4ODMsImV4cCI6MTc0NzM4MTQ4M30.QeFrrNXaechoQUhePJohRimaZZNBAswKMv92zJnZ2S0
+@base_url = http://192.168.1.170:3000
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDc0MDIxMTYsImV4cCI6MTc0NzQwNTcxNn0.0MCHKwMD23tlCGznL0B951f-9TXGv2VK47Pg_omA0T4
 
 @item_id = 19275c24-7375-4336-bd6d-91de971990c4
 
@@ -50,6 +50,7 @@ Content-Type: application/json
 {
   "name": "sports"
 }
+
 
 
 ###
@@ -152,3 +153,18 @@ Authorization: Bearer {{token}}
 
 ### Recherche image Unsplash
 GET {{base_url}}/lookup?q=apple
+
+
+
+
+
+###
+# Ajouter la catégorie Food avec image locale
+POST {{base_url}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "food",
+  "imageUrl": "/static/images/categories/food.png"
+}
