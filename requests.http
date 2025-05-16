@@ -1,9 +1,11 @@
 @base_url = http://localhost:3000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczNDQ1NzksImV4cCI6MTc0NzM0ODE3OX0.qetbApkqJCfM_4KKaPhQidMHqtFJcEH347hajYcMQhA
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDczNzc4ODMsImV4cCI6MTc0NzM4MTQ4M30.QeFrrNXaechoQUhePJohRimaZZNBAswKMv92zJnZ2S0
 
 @item_id = 19275c24-7375-4336-bd6d-91de971990c4
 
 @list_id = 5418022d-8a50-4dd3-bc05-de233110a2b6
+
+@category_id = 50a19592-94b5-4baf-8a01-8edbb467954f
 
 ###  
 # 1) Inscription
@@ -38,6 +40,43 @@ Content-Type: application/json
 GET {{base_url}}/users/me
 Authorization: Bearer {{token}}
 
+
+###
+# 1) Créer une catégorie
+POST {{base_url}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "sports"
+}
+
+
+###
+# 2) Lister toutes les catégories
+GET {{base_url}}/categories
+Authorization: Bearer {{token}}
+
+###
+# 3) Récupérer une catégorie précise
+GET {{base_url}}/categories/{{category_id}}
+Authorization: Bearer {{token}}
+
+###
+# 4) Mettre à jour la catégorie
+PATCH {{base_url}}/categories/{{category_id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "outdoor-sports"
+}
+
+###
+# 5) Supprimer la catégorie
+DELETE {{base_url}}/categories/{{category_id}}
+Authorization: Bearer {{token}}
+
 ###  
 # 4) Créer un Top (List)
 POST {{base_url}}/lists
@@ -46,7 +85,7 @@ Content-Type: application/json
 
 {
   "title": "Top 5 Films",
-  "category": "films"
+  "category": "50a19592-94b5-4baf-8a01-8edbb467954f"
 }
 
 ###  
@@ -83,7 +122,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "apple",
+  "name": "patate",
   "rank": 3
 }
 

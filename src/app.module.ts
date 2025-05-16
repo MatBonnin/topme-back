@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { ListsModule } from './lists/lists.module';
 import { ItemsModule } from './items/items.module';
 import { LookupModule } from './lookup/lookup.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LookupModule } from './lookup/lookup.module';
     ListsModule,
     ItemsModule,
     LookupModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

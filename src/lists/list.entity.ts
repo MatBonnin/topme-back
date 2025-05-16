@@ -1,14 +1,16 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
+import { Category } from '../categories/category.entity';
 import { Item } from '../items/item.entity';
 import { User } from '../users/user.entity';
-
-export enum Category {
-  FILMS = 'films',
-  BOUFFE = 'bouffe',
-  VOITURES = 'voitures',
-  COULEURS = 'couleurs',
-}
 
 @Entity()
 export class List {
@@ -18,7 +20,10 @@ export class List {
   @Column()
   title: string;
 
-  @Column({ type: 'enum', enum: Category })
+  @ManyToOne(() => Category, category => category.lists, {
+    eager: true,
+    onDelete: 'RESTRICT',
+  })
   category: Category;
 
   @ManyToOne(() => User, user => user.lists, { onDelete: 'CASCADE' })
