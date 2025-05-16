@@ -1,19 +1,21 @@
 // src/validation/validation.controller.ts
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard }                     from '../auth/jwt-auth.guard';
 import { ValidationService }                from './validation.service';
+
+class ValidateDto {
+  category: string;
+  items: string[];
+}
 
 @Controller('validate')
 @UseGuards(JwtAuthGuard)
 export class ValidationController {
   constructor(private vs: ValidationService) {}
 
-  @Get()
-  async check(
-    @Query('category') category: string,
-    @Query('item') item: string,
-  ) {
-    const valid = await this.vs.validateItem(category, item);
-    return { valid };
+  @Post()
+  async batchValidate(@Body() dto: ValidateDto) {
+    return this.vs.validateItems(dto.category, dto.items);
   }
 }

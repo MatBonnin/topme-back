@@ -1,6 +1,4 @@
 // src/app.module.ts
-import { ValidationService } from './validation/validation.service';
-import { ValidationModule } from './validation/validation.module';
 
 import { Module, OnModuleInit }      from '@nestjs/common';
 
@@ -15,6 +13,8 @@ import { LookupModule }              from './lookup/lookup.module';
 import { ServeStaticModule }         from '@nestjs/serve-static';
 import { TypeOrmModule }             from '@nestjs/typeorm';
 import { UsersModule }               from './users/users.module';
+import { ValidationModule } from './validation/validation.module';
+import { ValidationService } from './validation/validation.service';
 import { join }                      from 'path';
 
 @Module({
@@ -43,7 +43,7 @@ import { join }                      from 'path';
     LookupModule,
     ValidationModule,
   ],
-  providers: [ValidationService],
+  providers: [],
   // Pas besoin de providers ici, on utilisera CategoriesService
 })
 export class AppModule implements OnModuleInit {
