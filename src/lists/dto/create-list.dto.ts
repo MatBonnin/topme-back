@@ -6,6 +6,6 @@ export class CreateListDto {
   @IsNotEmpty()
   title: string;
 
-  @IsEnum(Category)
-  category: Category;
+  @IsUUID()
+  categoryId: string;
 }

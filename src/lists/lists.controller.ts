@@ -1,3 +1,4 @@
+// src/lists/lists.controller.ts
 import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ListsService } from './lists.service';
@@ -11,12 +12,22 @@ export class ListsController {
 
   @Post()
   create(@Req() req, @Body() dto: CreateListDto) {
+ 
+    console.log('dto', dto);
     return this.listsService.create(req.user, dto);
   }
 
   @Get()
   findAll(@Req() req) {
     return this.listsService.findAll(req.user);
+  }
+
+  @Get('category/:categoryId')                            // ← nouvelle route
+  findByCategory(
+    @Req() req,
+    @Param('categoryId') categoryId: string,
+  ) {
+    return this.listsService.findByCategory(req.user, categoryId);
   }
 
   @Get(':id')
@@ -26,6 +37,7 @@ export class ListsController {
 
   @Patch(':id')
   update(@Req() req, @Param('id') id: string, @Body() dto: UpdateListDto) {
+    console.log('update dto', dto);
     return this.listsService.update(id, req.user, dto);
   }
 

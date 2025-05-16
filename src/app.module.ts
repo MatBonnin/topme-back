@@ -1,4 +1,6 @@
 // src/app.module.ts
+import { ValidationService } from './validation/validation.service';
+import { ValidationModule } from './validation/validation.module';
 
 import { Module, OnModuleInit }      from '@nestjs/common';
 
@@ -39,7 +41,9 @@ import { join }                      from 'path';
     ListsModule,
     ItemsModule,
     LookupModule,
+    ValidationModule,
   ],
+  providers: [ValidationService],
   // Pas besoin de providers ici, on utilisera CategoriesService
 })
 export class AppModule implements OnModuleInit {

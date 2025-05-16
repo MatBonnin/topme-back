@@ -38,3 +38,4 @@ export class List {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
