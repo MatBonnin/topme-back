@@ -1,3 +1,5 @@
+import { CategoriesModule } from 'src/categories/categories.module';
+import { Category } from 'src/categories/category.entity';
 import { CategoryStat } from './category-stat.entity';
 import { Item } from '../items/item.entity';
 import { ItemStat } from './item-stat.entity';
@@ -9,7 +11,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CategoryStat, ItemStat, List, Item]),
+    TypeOrmModule.forFeature([CategoryStat, ItemStat, List, Item, Category]),
+    CategoriesModule,
   ],
   providers: [StatsService],
   controllers: [StatsController],

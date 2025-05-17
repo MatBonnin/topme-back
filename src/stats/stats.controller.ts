@@ -8,8 +8,9 @@ export class StatsController {
   constructor(private readonly stats: StatsService) {}
 
   @Get('categories')
-  getCategories() {
-    return this.stats.getCategoryStats();
+  async getCategories() {
+    // Renvoie [{ categoryId, listCount, completedCount, name, imageUrl }]
+    return this.stats.getCategoryStatsWithNames();
   }
 
   @Get('categories/:id/items')

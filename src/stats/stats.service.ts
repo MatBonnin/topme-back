@@ -6,6 +6,7 @@ import { CategoryStat } from './category-stat.entity';
 import { ItemStat } from './item-stat.entity';
 import { List } from '../lists/list.entity';
 import { Item } from '../items/item.entity';
+import { Category } from '../categories/category.entity';
 
 @Injectable()
 export class StatsService {
@@ -20,6 +21,8 @@ export class StatsService {
     private readonly listRepo: Repository<List>,
     @InjectRepository(Item)
     private readonly itemRepo: Repository<Item>,
+    @InjectRepository(Category)
+    private readonly categoryRepo: Repository<Category>,
   ) {}
 
   /** Toutes les heures à minute 0 */
@@ -94,5 +97,17 @@ export class StatsService {
       order: { score: 'DESC' },
       take: 20,
     });
+  }
+
+  async getCategoryStatsWithNames() {
+    const stats = await this.catStatRepo.find({ order: { listCount: 'DESC' } });
+    const ids = stats.map(s => s.categoryId);
+    const cats = await this.categoryRepo.findByIds(ids);
+    const idToCat = Object.fromEntries(cats.map(c => [c.id, c]));
+    return stats.map(s => ({
+      ...s,
+      name: idToCat[s.categoryId]?.name ?? null,
+      imageUrl: idToCat[s.categoryId]?.imageUrl ?? null, // ← ajoute imageUrl
+    }));
   }
 }
