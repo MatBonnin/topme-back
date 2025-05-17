@@ -12,7 +12,9 @@ import { I18nModule } from './i18n/i18n.module';
 import { ItemsModule }               from './items/items.module';
 import { ListsModule }               from './lists/lists.module';
 import { LookupModule }              from './lookup/lookup.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule }         from '@nestjs/serve-static';
+import { StatsModule } from './stats/stats.module';
 import { TranslateModule } from './translate/translate.module';
 import { TranslateService } from './translate/translate.service';
 import { TypeOrmModule }             from '@nestjs/typeorm';
@@ -48,6 +50,8 @@ import { join }                      from 'path';
     ValidationModule,
     I18nModule,
     TranslateModule,
+    ScheduleModule.forRoot(),
+    StatsModule,
   ],
   providers: [],
   controllers: [],
@@ -63,24 +67,24 @@ export class AppModule implements OnModuleInit {
       // { name: 'cars' },
       // { name: 'colors' },
       // { name: 'books' },
-      { name: 'sports' },
-      { name: 'video-games' },
-      { name: 'tv-shows' },
-      { name: 'podcasts' },
-      { name: 'cities' },
-      { name: 'countries' },
-      { name: 'drinks' },
-      { name: 'coffees' },
-      { name: 'beers' },
-      { name: 'animals' },
-      { name: 'hobbies' },
-      { name: 'recipes' },
-      { name: 'artists' },
-      { name: 'songs' },
-      { name: 'board-games' },
-      { name: 'apps' },
-      { name: 'comics' },
-      { name: 'programming-langs' },
+      // { name: 'sports' },
+      // { name: 'video-games' },
+      // { name: 'tv-shows' },
+      // { name: 'podcasts' },
+      // { name: 'cities' },
+      // { name: 'countries' },
+      // { name: 'drinks' },
+      // { name: 'coffees' },
+      // { name: 'beers' },
+      // { name: 'animals' },
+      // { name: 'hobbies' },
+      // { name: 'recipes' },
+      // { name: 'artists' },
+      // { name: 'songs' },
+      // { name: 'board-games' },
+      // { name: 'apps' },
+      // { name: 'comics' },
+      // { name: 'programming-langs' },
     ];
 
     // Récupère une seule fois la liste des catégories existantes
