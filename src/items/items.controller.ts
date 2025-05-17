@@ -10,7 +10,10 @@ export class ItemsController {
   constructor(private itemsService: ItemsService) {}
 
   @Post()
-  create(@Param('listId') listId: string, @Body() dto: CreateItemDto) {
+  create(@Param('listId') listId: string, @Body() dto: CreateItemDto & { lang: string }) {
+    console.log('create item', dto);
+    console.log('listId', listId);
+
     return this.itemsService.create(listId, dto);
   }
 
@@ -20,7 +23,11 @@ export class ItemsController {
   }
 
   @Patch(':itemId')
-  update(@Param('listId') listId: string, @Param('itemId') itemId: string, @Body() dto: UpdateItemDto) {
+  update(
+    @Param('listId') listId: string,
+    @Param('itemId') itemId: string,
+    @Body() dto: UpdateItemDto & { lang: string }
+  ) {
     return this.itemsService.update(listId, itemId, dto);
   }
 

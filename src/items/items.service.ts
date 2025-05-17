@@ -8,6 +8,9 @@ import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { ListsService } from '../lists/lists.service';
 import { LookupService } from '../lookup/lookup.service';
+import { TranslateService } from 'src/translate/translate.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ItemsService {
@@ -16,34 +19,60 @@ export class ItemsService {
     private readonly repo: Repository<Item>,
     private readonly listsService: ListsService,
     private readonly lookupService: LookupService,
+    private readonly translate: TranslateService,
   ) {}
 
   /**
    * Crée un nouvel item dans la liste, puis lance en tâche de fond
    * la récupération automatisée d'une image.
    */
-  async create(listId: string, dto: CreateItemDto) {
-    // 1. Récupérer la liste (avec gestion de droits si nécessaire)
-    const list = await this.listsService.findOne(listId,dto['user']);
+  async create(listId: string, dto: CreateItemDto & { lang: string }) {
+    // 1) Traduction en anglais
+    const englishName = await this.translate.toEnglish(dto.name, dto.lang);
 
-    // 2. Créer et sauvegarder l'item sans image
-    const item = this.repo.create({ ...dto, list });
+    // 2) Créer l’item en base avec englishName
+    const item = this.repo.create({
+      list: await this.listsService.findOne(listId, dto['user']),
+      name: englishName,
+      rank: dto.rank,
+      // pas dto.name
+    });
     await this.repo.save(item);
 
-    // 3. En tâche de fond, fetch et met à jour imageUrl
-    this.lookupService
-      .fetchImageFor(dto.name)
-      .then(async (imageUrl) => {
-        if (imageUrl) {
-          await this.repo.update(item.id, { imageUrl });
-        }
-      })
-      .catch((err) => {
-        // log ou gérer l'erreur sans bloquer la création
-        console.error(`Lookup image failed for "${dto.name}":`, err);
-      });
+    // 3) Lookup image via englishName
+    this.lookupService.fetchImageFor(englishName) ;
+
+    // 4) Mettre à jour les fichiers i18n  
+    this.emitTranslationFiles(englishName, dto.name);
 
     return item;
+  }
+
+  private async emitTranslationFiles(eng: string, original: string) {
+    const langs = ['en', 'fr', 'es'];
+    for (const lang of langs) {
+      // 1) si lang==='en', value=eng, sinon on traduit en target lang
+      let value: string;
+      if (lang === 'en') {
+        value = eng;
+      } else {
+        // On traduit de l'anglais vers la langue cible
+        value = await this.translate.translate(eng, 'en', lang);
+      }
+      // 2) charger le JSON
+      const file = path.join(__dirname, '../i18n/locales', `${lang}.json`);
+      let obj: any = {};
+      try {
+        obj = JSON.parse(fs.readFileSync(file, 'utf-8'));
+      } catch {
+        obj = {};
+      }
+      // 3) ajouter ou écraser "items.<englishName>" = value
+      obj.items = obj.items || {};
+      obj.items[eng] = value;
+      // 4) réécrire le JSON
+      fs.writeFileSync(file, JSON.stringify(obj, null, 2));
+    }
   }
 
   /**
@@ -59,14 +88,25 @@ export class ItemsService {
   /**
    * Met à jour un item existant.
    */
-  async update(listId: string, itemId: string, dto: UpdateItemDto) {
+  async update(listId: string, itemId: string, dto: UpdateItemDto & { lang: string, user?: any }) {
     const item = await this.repo.findOne({
       where: { id: itemId, list: { id: listId } },
     });
     if (!item) {
       throw new NotFoundException('Élément non trouvé');
     }
-    Object.assign(item, dto);
+
+    // Traduire le nom en anglais si présent dans le DTO
+    if (dto.name && dto.lang) {
+      const englishName = await this.translate.toEnglish(dto.name, dto.lang);
+      item.name = englishName;
+      // Mettre à jour les fichiers i18n
+      this.emitTranslationFiles(englishName, dto.name);
+    }
+
+    // Appliquer les autres champs du DTO (hors name/lang)
+    Object.assign(item, { ...dto, name: item.name });
+
     return this.repo.save(item);
   }
 

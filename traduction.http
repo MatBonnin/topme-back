@@ -1,0 +1,47 @@
+###
+# Traduction simple EN > FR
+POST http://localhost:8080/translate
+Content-Type: application/json
+
+{
+  "q": "Hello world",
+  "source": "en",
+  "target": "fr",
+  "format": "text"
+}
+
+###
+# Traduction simple FR > EN
+POST http://localhost:8080/translate
+Content-Type: application/json
+
+{
+  "q": "Bonjour tout le monde",
+  "source": "fr",
+  "target": "en",
+  "format": "text"
+}
+
+###
+# Traduction simple EN > ES
+POST http://localhost:8080/translate
+Content-Type: application/json
+
+{
+  "q": "How are you?",
+  "source": "en",
+  "target": "es",
+  "format": "text"
+}
+
+###
+# Test d’un texte plus long FR > IT
+POST http://localhost:5000/translate
+Content-Type: application/json
+
+{
+  "q": "J'aime beaucoup le développement web avec NestJS et React Native.",
+  "source": "en",
+  "target": "it",
+  "format": "text"
+}

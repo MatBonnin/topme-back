@@ -7,10 +7,14 @@ import { CategoriesModule }          from './categories/categories.module';
 import { CategoriesService }         from './categories/categories.service';
 import { Category }                  from './categories/category.entity';
 import { ConfigModule }              from '@nestjs/config';
+import { I18nController } from './i18n/i18n.controller';
+import { I18nModule } from './i18n/i18n.module';
 import { ItemsModule }               from './items/items.module';
 import { ListsModule }               from './lists/lists.module';
 import { LookupModule }              from './lookup/lookup.module';
 import { ServeStaticModule }         from '@nestjs/serve-static';
+import { TranslateModule } from './translate/translate.module';
+import { TranslateService } from './translate/translate.service';
 import { TypeOrmModule }             from '@nestjs/typeorm';
 import { UsersModule }               from './users/users.module';
 import { ValidationModule } from './validation/validation.module';
@@ -42,8 +46,11 @@ import { join }                      from 'path';
     ItemsModule,
     LookupModule,
     ValidationModule,
+    I18nModule,
+    TranslateModule,
   ],
   providers: [],
+  controllers: [],
   // Pas besoin de providers ici, on utilisera CategoriesService
 })
 export class AppModule implements OnModuleInit {

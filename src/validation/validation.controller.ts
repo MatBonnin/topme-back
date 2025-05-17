@@ -6,7 +6,8 @@ import { ValidationService }                from './validation.service';
 
 class ValidateDto {
   category: string;
-  items: string[];
+  items: { rank: number; name: string }[];
+  lang: string;
 }
 
 @Controller('validate')
@@ -16,6 +17,6 @@ export class ValidationController {
 
   @Post()
   async batchValidate(@Body() dto: ValidateDto) {
-    return this.vs.validateItems(dto.category, dto.items);
+    return this.vs.validateItems(dto.category, dto.items, dto.lang);
   }
 }

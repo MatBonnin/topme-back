@@ -1,0 +1,38 @@
+{
+  "categories": {
+    "films":       "Films",
+    "food":        "Food",
+    "cars":        "Cars",
+    "colors":      "Colors",
+    "music": "Music",
+    "books": "Books",
+    "sports": "Sports",
+    "video-games": "Video Games",
+    "tv-shows": "TV Shows",
+    "podcasts": "Podcasts",
+    "travel": "Travel",
+    "cities": "Cities",
+    "countries": "Countries",
+    "drinks": "Drinks",
+    "coffees": "Coffees",
+    "beers": "Beers",
+    "animals": "Animals",
+    "hobbies": "Hobbies",
+    "recipes": "Recipes",
+    "artists": "Artists",
+    "songs": "Songs",
+    "quotes": "Quotes",
+    "fashion": "Fashion",
+    "gadgets": "Gadgets",
+    "tech": "Tech",
+    "board-games": "Board Games",
+    "apps": "Apps",
+    "movies-classics": "Movies Classics",
+    "comics": "Comics",
+    "programming-langs": "Programming Languages"
+  }
+  ,
+  "items": {
+
+  }
+}
