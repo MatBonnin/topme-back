@@ -11,7 +11,7 @@ export class TranslateService {
   async toEnglish(text: string, sourceLang: string): Promise<string> {
     const res = await firstValueFrom(
       this.http.post(
-        process.env.LIBRETRANSLATE_URL || 'http://localhost:8080/translate',
+        process.env.TRANSLATE_API_URL || 'http://localhost:5000/translate',
         {
           q: text,
           source: sourceLang,
@@ -29,7 +29,7 @@ export class TranslateService {
   async translate(text: string, sourceLang: string, targetLang: string): Promise<string> {
     const res = await firstValueFrom(
       this.http.post(
-        process.env.LIBRETRANSLATE_URL || 'http://localhost:8080/translate',
+        process.env.TRANSLATE_API_URL || 'http://localhost:5000/translate',
         {
           q: text,
           source: sourceLang,

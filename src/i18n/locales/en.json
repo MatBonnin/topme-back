@@ -1,9 +1,9 @@
 {
   "categories": {
-    "films":       "Films",
-    "food":        "Food",
-    "cars":        "Cars",
-    "colors":      "Colors",
+    "films": "Films",
+    "food": "Food",
+    "cars": "Cars",
+    "colors": "Colors",
     "music": "Music",
     "books": "Books",
     "sports": "Sports",
@@ -30,9 +30,15 @@
     "movies-classics": "Movies Classics",
     "comics": "Comics",
     "programming-langs": "Programming Languages"
-  }
-  ,
+  },
   "items": {
-
+    "Fruit juice": "Fruit juice",
+    "Apple juice": "Apple juice",
+    "Apple Justice": "Apple Justice",
+    "Banana juice": "Banana juice",
+    "Hiking": "Hiking",
+    "Video games": "Video games",
+    "Party": "Party",
+    "Music": "Music"
   }
 }

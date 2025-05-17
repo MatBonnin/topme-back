@@ -1,9 +1,9 @@
 {
   "categories": {
-    "films":       "Films",
-    "food":        "Bouffe",
-    "cars":        "Voitures",
-    "colors":      "Couleurs",
+    "films": "Films",
+    "food": "Bouffe",
+    "cars": "Voitures",
+    "colors": "Couleurs",
     "music": "Musique",
     "books": "Livres",
     "sports": "Sports",
@@ -30,5 +30,15 @@
     "movies-classics": "Classiques du cinéma",
     "comics": "Bandes dessinées",
     "programming-langs": "Langages de programmation"
+  },
+  "items": {
+    "Fruit juice": "Jus de fruits",
+    "Apple juice": "Jus de pomme",
+    "Apple Justice": "Justice des pommes",
+    "Banana juice": "Jus de banane",
+    "Hiking": "Randonnée",
+    "Video games": "Jeux vidéo",
+    "Party": "Parti",
+    "Music": "Musique"
   }
 }
