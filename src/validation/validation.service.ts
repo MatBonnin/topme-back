@@ -66,8 +66,9 @@ export class ValidationService {
 
     // 2) Appel IA pour ceux qui manquent
     if (toValidate.length > 0) {
-      const itemsForPrompt = toValidate.map(i => `${i.rank}: ${i.eng}`).join(', ');
-      const userPrompt = `
+      try {
+        const itemsForPrompt = toValidate.map(i => `${i.rank}: ${i.eng}`).join(', ');
+        const userPrompt = `
 Here is a category and a list of items in English, each with a rank.
 Return a JSON object mapping each rank (as a number) to true if the item belongs to the category, or false otherwise.
 Only output false if absolutely certain; otherwise true.
@@ -82,34 +83,42 @@ Example:
 }
       `.trim();
 
-      const completion = await this.client.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        temperature: 0.0,
-        max_tokens: 256,
-        messages: [
-          { role: 'system', content: 'You are a strict validator.' },
-          { role: 'user',   content: userPrompt },
-        ],
-      });
+        const completion = await this.client.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          temperature: 0.0,
+          max_tokens: 256,
+          messages: [
+            { role: 'system', content: 'You are a strict validator.' },
+            { role: 'user',   content: userPrompt },
+          ],
+        });
 
-      const content = completion.choices[0].message?.content;
-      if (!content) {
-        throw new BadRequestException('Réponse IA invalide : contenu manquant');
-      }
-      const text = content.trim();
-      let parsed: Record<string, boolean>;
-      try {
-        parsed = JSON.parse(text);
-      } catch {
-        throw new BadRequestException(`Réponse IA invalide : ${text}`);
-      }
+        const content = completion.choices[0].message?.content;
+        if (!content) {
+          throw new BadRequestException('Réponse IA invalide : contenu manquant');
+        }
+        const text = content.trim();
+        let parsed: Record<string, boolean>;
+        try {
+          parsed = JSON.parse(text);
+        } catch {
+          throw new BadRequestException(`Réponse IA invalide : ${text}`);
+        }
 
-      // 3) Persister et ajouter au résultat
-      for (const { rank, eng } of toValidate) {
-        const ok = parsed[String(rank)] ?? false;
-        result[rank] = ok;
-        const record = this.repo.create({ category, item: eng, isValid: ok });
-        await this.repo.save(record);
+        // 3) Persister et ajouter au résultat
+        for (const { rank, eng } of toValidate) {
+          const ok = parsed[String(rank)] ?? false;
+          result[rank] = ok;
+          const record = this.repo.create({ category, item: eng, isValid: ok });
+          await this.repo.save(record);
+        }
+      } catch (err) {
+        // En cas d’erreur OpenAI, tout passe à true
+        for (const { rank, eng } of toValidate) {
+          result[rank] = true;
+          const record = this.repo.create({ category, item: eng, isValid: true });
+          await this.repo.save(record);
+        }
       }
     }
     // 4) Retourne { [rank]: boolean }

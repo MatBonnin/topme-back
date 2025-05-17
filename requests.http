@@ -1,5 +1,5 @@
 @base_url = http://192.168.1.170:3000
-@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDc0MDIxMTYsImV4cCI6MTc0NzQwNTcxNn0.0MCHKwMD23tlCGznL0B951f-9TXGv2VK47Pg_omA0T4
+@token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxZTExMDRiZi04NjkxLTQyYTEtOTE2Zi0zM2U1MDA2MzVhMjMiLCJlbWFpbCI6Im1hdGhpZXVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDc0NzcyMzMsImV4cCI6MTc0NzQ4MDgzM30.PM0HpcHlyDZDj9z3Q2al0g4zCWIl2gdB0VOHTHPHURM
 
 @item_id = 19275c24-7375-4336-bd6d-91de971990c4
 
@@ -48,7 +48,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "name": "sports"
+  "name": "Plantes"
 }
 
 

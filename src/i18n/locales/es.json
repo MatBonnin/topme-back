@@ -1,12 +1,33 @@
 {
   "items": {
-    "Fruit juice": "Zumo de frutas",
-    "Apple juice": "Zumo de manzana",
-    "Apple Justice": "Apple Justice",
-    "Banana juice": "Zumo de plátano",
-    "Hiking": "Senderismo",
-    "Video games": "Videojuegos",
-    "Party": "Partido",
-    "Music": "Música"
+    "Cluedo": "Cluedo",
+    "Turn your hand": "Gire la mano",
+    "X": "X",
+    "Snapchat": "Snapchat"
+  },
+  "categories": {
+    "films": "películas",
+    "food": "alimentos",
+    "cars": "coches",
+    "colors": "colores",
+    "books": "libros",
+    "sports": "deportes",
+    "video-games": "videojuegos",
+    "tv-shows": "tv-shows",
+    "podcasts": "podcasts",
+    "cities": "ciudades",
+    "countries": "países",
+    "drinks": "bebidas",
+    "coffees": "cafés",
+    "beers": "cervezas",
+    "animals": "animales",
+    "hobbies": "hobbies",
+    "recipes": "recetas",
+    "artists": "artistas",
+    "songs": "canciones",
+    "board-games": "juegos de mesa",
+    "apps": "aplicaciones",
+    "comics": "cómics",
+    "programming-langs": "programación-langs"
   }
 }

@@ -22,12 +22,12 @@ export class CategoriesController {
   }
 
   @Post()
-  create(@Body() dto: CreateCategoryDto) {
+  create(@Body() dto: CreateCategoryDto & { lang: string }) {
     return this.svc.create(dto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
+  update(@Param('id') id: string, @Body() dto: UpdateCategoryDto & { lang?: string }) {
     return this.svc.update(id, dto);
   }
 
