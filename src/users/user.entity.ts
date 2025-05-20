@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+// src/users/user.entity.ts
+
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { List } from '../lists/list.entity';
 
@@ -6,6 +13,9 @@ import { List } from '../lists/list.entity';
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ unique: true, nullable: true })
+  facebookId?: string;
 
   @Column({ unique: true })
   email: string;
@@ -20,5 +30,5 @@ export class User {
   avatarUrl: string;
 
   @OneToMany(() => List, list => list.user)
-  lists: List[];   // ← ajoute cette ligne
+  lists: List[];
 }

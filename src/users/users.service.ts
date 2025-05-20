@@ -23,4 +23,41 @@ export class UsersService {
   async findById(id: string): Promise<User|null> {
     return this.repo.findOne({ where: { id } });
   }
+
+  async findByFacebookId(facebookId: string): Promise<User | null> {
+    return this.repo.findOne({ where: { facebookId } });
+  }
+
+  async findOrCreateFromFacebook(profile: {
+    id: string;
+    email: string;
+    name: string;
+    picture: string;
+  }): Promise<User> {
+    let user = await this.findByFacebookId(profile.id);
+    if (user) return user;
+
+    // Vérification de l'email avant la recherche
+    if (profile.email) {
+      user = await this.repo.findOne({ where: { email: profile.email } });
+      if (user) {
+        user.facebookId = profile.id;
+        user.avatarUrl = profile.picture;
+        return this.repo.save(user);
+      }
+    }
+
+    // sinon, on crée un nouvel utilisateur
+    const randomPassword = Math.random().toString(36).slice(-8);
+    const hash = await bcrypt.hash(randomPassword, 10);
+    const newUser = this.repo.create({
+      facebookId: profile.id,
+      email: profile.email,
+      username: profile.name,
+      passwordHash: hash,
+      avatarUrl: profile.picture,
+    });
+    return this.repo.save(newUser);
+  }
+
 }

@@ -8,6 +8,9 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
 
+// Ajout :
+
+
 @Module({
   imports: [
     UsersModule,
@@ -20,7 +23,7 @@ import { UsersModule } from '../users/users.module';
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy], // Ajoute InstagramStrategy
   controllers: [AuthController],
 })
 export class AuthModule {}

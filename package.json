@@ -37,6 +37,7 @@
     "class-validator": "^0.14.2",
     "openai": "^4.100.0",
     "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.0",
     "reflect-metadata": "^0.2.2",

@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 
+import { FacebookLoginDto } from './dto/facebook-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { QueryFailedError } from 'typeorm';
@@ -44,5 +45,34 @@ export class AuthService {
     const user = await this.validateUser(dto.email, dto.password);
     const payload = { sub: user.id, email: user.email };
     return { access_token: this.jwtService.sign(payload), user };
+  }
+
+
+    private async fetchFacebookProfile(
+    accessToken: string,
+  ): Promise<{ id: string; email: string; name: string; picture: string }> {
+    const res = await fetch(
+      `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${accessToken}`,
+    );
+    if (!res.ok) {
+      throw new UnauthorizedException('Token Facebook invalide');
+    }
+    const data = await res.json();
+    return {
+      id: data.id,
+      email: data.email,
+      name: data.name,
+      picture: data.picture.data.url,
+    };
+  }
+
+  async loginWithFacebook(dto: FacebookLoginDto) {
+    const profile = await this.fetchFacebookProfile(dto.accessToken);
+    const user = await this.usersService.findOrCreateFromFacebook(profile);
+    const payload = { sub: user.id, email: user.email };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user,
+    };
   }
 }
