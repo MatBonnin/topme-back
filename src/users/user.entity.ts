@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { Friendship } from '../friendship/friendship.entity';
 import { List } from '../lists/list.entity';
 
 @Entity()
@@ -31,4 +32,10 @@ export class User {
 
   @OneToMany(() => List, list => list.user)
   lists: List[];
+
+  @OneToMany(() => Friendship, f => f.requester)
+  sentFriendRequests: Friendship[];
+
+  @OneToMany(() => Friendship, f => f.addressee)
+  receivedFriendRequests: Friendship[];
 }

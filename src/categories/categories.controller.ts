@@ -1,5 +1,5 @@
 // src/categories/categories.controller.ts
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -14,6 +14,11 @@ export class CategoriesController {
   @Get()
   findAll() {
     return this.svc.findAll();
+  }
+
+  @Get('top-of-the-day')
+  async getTopCategoryOfTheDay(@Req() req) {
+    return this.svc.getTopCategoryOfTheDayWithUser(req.user);
   }
 
   @Get(':id')

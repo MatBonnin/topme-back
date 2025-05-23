@@ -14,6 +14,9 @@ import axios                               from 'axios';
 import { TranslateService } from 'src/translate/translate.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import { DailyTopCategory } from './daily-top-category.entity';
+import { ListsService } from '../lists/lists.service';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -22,8 +25,10 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly repo: Repository<Category>,
+    @InjectRepository(DailyTopCategory) private dailyTopRepo: Repository<DailyTopCategory>,
     private readonly cfg: ConfigService,
     private readonly translate: TranslateService,
+    private readonly listsService: ListsService, // injection ListsService
   ) {
     const apiKey = this.cfg.get<string>('OPENAI_API_KEY');
     if (!apiKey) throw new Error('OPENAI_API_KEY manquant');
@@ -153,5 +158,40 @@ export class CategoriesService {
     const cat = await this.findOne(id);
     await this.repo.remove(cat);
     return { deleted: true };
+  }
+
+
+  /**
+   * Retourne une catégorie du jour propre à l'utilisateur, persistée en base (DailyTopCategory)
+   */
+  async getTopCategoryOfTheDayWithUser(user: User): Promise<{ category: Category | null, hasFilled: boolean }> {
+    if (!user || !user.id) return { category: null, hasFilled: false };
+    // 1. Vérifier si un DailyTopCategory existe déjà pour cet utilisateur aujourd'hui
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let dailyTop = await this.dailyTopRepo.findOne({ where: { user: { id: user.id }, date: today } });
+    let category: Category | null = null;
+    if (dailyTop) {
+      category = dailyTop.category;
+    } else {
+      // 2. Récupérer toutes les catégories déjà faites par l'utilisateur
+      const userLists = await this.listsService.findAll(user);
+      const doneCategoryIds = userLists.map(l => l.category.id);
+      // 3. Récupérer toutes les catégories non faites
+      const allCategories = await this.repo.find();
+      const available = allCategories.filter(cat => !doneCategoryIds.includes(cat.id));
+      if (available.length === 0) return { category: null, hasFilled: false };
+      // 4. Choisir une catégorie aléatoire parmi celles non faites
+      const idx = Math.floor(Math.random() * available.length);
+      category = available[idx];
+      // 5. Persister le DailyTopCategory pour l'utilisateur
+      dailyTop = this.dailyTopRepo.create({ user, category, date: today });
+      await this.dailyTopRepo.save(dailyTop);
+    }
+    // 6. Vérifier si l'utilisateur a déjà rempli cette catégorie
+    const userLists = await this.listsService.findAll(user);
+    const doneCategoryIds = userLists.map(l => l.category.id);
+    const hasFilled = !!category && doneCategoryIds.includes(category.id);
+    return { category, hasFilled };
   }
 }
