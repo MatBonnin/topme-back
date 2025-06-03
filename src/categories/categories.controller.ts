@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 
 @Controller('categories')
@@ -17,7 +18,7 @@ export class CategoriesController {
   }
 
   @Get('top-of-the-day')
-  async getTopCategoryOfTheDay(@Req() req) {
+  async getTopCategoryOfTheDay(@Req() req: RequestWithUser) {
     return this.svc.getTopCategoryOfTheDayWithUser(req.user);
   }
 

@@ -3,6 +3,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('lists/:listId/items')
 @UseGuards(JwtAuthGuard)
@@ -10,11 +11,15 @@ export class ItemsController {
   constructor(private itemsService: ItemsService) {}
 
   @Post()
-  create(@Param('listId') listId: string, @Body() dto: CreateItemDto & { lang: string }) {
+  create(
+    @Param('listId') listId: string,
+    @Body() dto: CreateItemDto & { lang: string },
+    @Req() req: RequestWithUser,
+  ) {
     console.log('create item', dto);
     console.log('listId', listId);
 
-    return this.itemsService.create(listId, dto);
+    return this.itemsService.create(listId, req.user, dto);
   }
 
   @Get()
@@ -26,13 +31,18 @@ export class ItemsController {
   update(
     @Param('listId') listId: string,
     @Param('itemId') itemId: string,
-    @Body() dto: UpdateItemDto & { lang: string }
+    @Body() dto: UpdateItemDto & { lang: string },
+    @Req() req: RequestWithUser,
   ) {
-    return this.itemsService.update(listId, itemId, dto);
+    return this.itemsService.update(listId, itemId, req.user, dto);
   }
 
   @Delete(':itemId')
-  remove(@Param('listId') listId: string, @Param('itemId') itemId: string) {
-    return this.itemsService.remove(listId, itemId);
+  remove(
+    @Param('listId') listId: string,
+    @Param('itemId') itemId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.itemsService.remove(listId, itemId, req.user);
   }
 }

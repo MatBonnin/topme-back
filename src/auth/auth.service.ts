@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { QueryFailedError } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
+import { AuthPayload } from './interfaces/auth-payload.interface';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 
@@ -71,7 +72,7 @@ export class AuthService {
   }
 
   /** Génère pair access+refresh tokens */
-  private generateTokens(user: User) {
+  private generateTokens(user: User): AuthPayload {
     const payload = { sub: user.id, email: user.email };
     const access_token = this.jwtService.sign(payload);
     const refresh_token = this.jwtService.sign(payload, {
@@ -81,12 +82,12 @@ export class AuthService {
     return { access_token, refresh_token, user };
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto): Promise<AuthPayload> {
     const user = await this.validateUser(dto.email, dto.password);
     return this.generateTokens(user);
   }
 
-  async loginWithFacebook(dto: FacebookLoginDto) {
+  async loginWithFacebook(dto: FacebookLoginDto): Promise<AuthPayload> {
     const profile = await this.fetchFacebookProfile(dto.accessToken);
     const user = await this.usersService.findOrCreateFromFacebook(profile);
     return this.generateTokens(user);
@@ -106,7 +107,7 @@ export class AuthService {
    * Rafraîchit l'access_token à partir du refresh_token.
    * Vérifie sa validité, lève UnauthorizedException sinon.
    */
-  async refresh(token: string): Promise<{ access_token: string; refresh_token: string }> {
+  async refresh(token: string): Promise<AuthPayload> {
     if (!token) {
       throw new UnauthorizedException('Refresh token manquant');
     }

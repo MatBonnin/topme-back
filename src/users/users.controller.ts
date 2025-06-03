@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UsersService, SearchUsersResult } from './users.service';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -16,7 +17,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  async getProfile(@Req() req) {
+  async getProfile(@Req() req: RequestWithUser) {
     const { passwordHash, ...user } = req.user;
     return user;
   }
@@ -26,7 +27,7 @@ export class UsersController {
    */
   @Get('search')
   async searchUsers(
-    @Req() req,
+    @Req() req: RequestWithUser,
     @Query('q') q: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,

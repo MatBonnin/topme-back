@@ -4,9 +4,12 @@ import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // Active le parsing des cookies pour lire refresh_token
   app.use(cookieParser());
