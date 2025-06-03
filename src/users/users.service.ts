@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, ILike, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
+
+export interface SearchUsersResult {
+  users: User[];
+  total: number;
+}
 
 @Injectable()
 export class UsersService {
@@ -37,7 +42,6 @@ export class UsersService {
     let user = await this.findByFacebookId(profile.id);
     if (user) return user;
 
-    // Vérification de l'email avant la recherche
     if (profile.email) {
       user = await this.repo.findOne({ where: { email: profile.email } });
       if (user) {
@@ -47,7 +51,6 @@ export class UsersService {
       }
     }
 
-    // sinon, on crée un nouvel utilisateur
     const randomPassword = Math.random().toString(36).slice(-8);
     const hash = await bcrypt.hash(randomPassword, 10);
     const newUser = this.repo.create({
@@ -60,4 +63,25 @@ export class UsersService {
     return this.repo.save(newUser);
   }
 
+  /**
+   * Recherche des utilisateurs par username ou email.
+   * Exclut l'utilisateur courant (excludeUserId) et retourne total + liste paginée.
+   */
+  async searchUsers(
+    query: string,
+    excludeUserId: string,
+    page = 1,
+    limit = 20,
+  ): Promise<SearchUsersResult> {
+    const qb: SelectQueryBuilder<User> = this.repo.createQueryBuilder('user');
+
+    qb.where('(user.username ILIKE :q OR user.email ILIKE :q)', { q: `%${query}%` })
+      .andWhere('user.id <> :self', { self: excludeUserId })
+      .orderBy('user.username', 'ASC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [users, total] = await qb.getManyAndCount();
+    return { users, total };
+  }
 }

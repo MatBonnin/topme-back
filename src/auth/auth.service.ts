@@ -1,9 +1,12 @@
-// src/auth/auth.service.ts
-
 import * as bcrypt from 'bcrypt';
 
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 
+import { ConfigService } from '@nestjs/config';
 import { FacebookLoginDto } from './dto/facebook-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
@@ -14,41 +17,42 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
+  private readonly refreshSecret: string;
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-  ) {}
+    private config: ConfigService,
+  ) {
+    // On récupère d’abord potentiellement undefined
+    const secret = this.config.get<string>('JWT_REFRESH_SECRET');
+    if (!secret) {
+      throw new Error('🚨 JWT_REFRESH_SECRET manquant dans .env');
+    }
+    // Puis on l’assigne à la propriété typée string
+    this.refreshSecret = secret;
+    
+
+  }
 
   async register(dto: RegisterDto): Promise<User> {
     try {
-      return await this.usersService.create(dto.email, dto.username, dto.password);
+      return await this.usersService.create(
+        dto.email,
+        dto.username,
+        dto.password,
+      );
     } catch (err: any) {
-      // TypeORM lance une QueryFailedError pour la contrainte unique
-      if (err instanceof QueryFailedError && err.driverError.code === '23505') {
-        // détail du err.driverError.detail = 'La clé « (email)=(...) » existe déjà.'
+      if (
+        err instanceof QueryFailedError &&
+        err.driverError.code === '23505'
+      ) {
         throw new ConflictException('Email déjà utilisé');
       }
-      // sinon on remonte
       throw err;
     }
   }
 
-  async validateUser(email: string, pass: string): Promise<User> {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) throw new UnauthorizedException('Identifiants invalides');
-    const valid = await bcrypt.compare(pass, user.passwordHash);
-    if (!valid) throw new UnauthorizedException('Identifiants invalides');
-    return user;
-  }
-
-  async login(dto: LoginDto) {
-    const user = await this.validateUser(dto.email, dto.password);
-    const payload = { sub: user.id, email: user.email };
-    return { access_token: this.jwtService.sign(payload), user };
-  }
-
-
-    private async fetchFacebookProfile(
+  private async fetchFacebookProfile(
     accessToken: string,
   ): Promise<{ id: string; email: string; name: string; picture: string }> {
     const res = await fetch(
@@ -66,13 +70,58 @@ export class AuthService {
     };
   }
 
+  /** Génère pair access+refresh tokens */
+  private generateTokens(user: User) {
+    const payload = { sub: user.id, email: user.email };
+    const access_token = this.jwtService.sign(payload);
+    const refresh_token = this.jwtService.sign(payload, {
+      secret: this.refreshSecret,
+      expiresIn: '7d',
+    });
+    return { access_token, refresh_token, user };
+  }
+
+  async login(dto: LoginDto) {
+    const user = await this.validateUser(dto.email, dto.password);
+    return this.generateTokens(user);
+  }
+
   async loginWithFacebook(dto: FacebookLoginDto) {
     const profile = await this.fetchFacebookProfile(dto.accessToken);
     const user = await this.usersService.findOrCreateFromFacebook(profile);
-    const payload = { sub: user.id, email: user.email };
-    return {
-      access_token: this.jwtService.sign(payload),
-      user,
-    };
+    return this.generateTokens(user);
+  }
+
+  async validateUser(email: string, pass: string): Promise<User> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user)
+      throw new UnauthorizedException('Identifiants invalides');
+    const valid = await bcrypt.compare(pass, user.passwordHash);
+    if (!valid)
+      throw new UnauthorizedException('Identifiants invalides');
+    return user;
+  }
+
+  /**
+   * Rafraîchit l'access_token à partir du refresh_token.
+   * Vérifie sa validité, lève UnauthorizedException sinon.
+   */
+  async refresh(token: string): Promise<{ access_token: string; refresh_token: string }> {
+    if (!token) {
+      throw new UnauthorizedException('Refresh token manquant');
+    }
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token, {
+        secret: this.refreshSecret,
+      });
+    } catch {
+      throw new UnauthorizedException('Refresh token invalide');
+    }
+    const user = await this.usersService.findById(payload.sub);
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur introuvable');
+    }
+    return this.generateTokens(user);
   }
 }
