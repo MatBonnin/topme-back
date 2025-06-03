@@ -9,6 +9,7 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { ListsService } from '../lists/lists.service';
 import { LookupService } from '../lookup/lookup.service';
 import { TranslateService } from 'src/translate/translate.service';
+import { User } from '../users/user.entity';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -26,13 +27,13 @@ export class ItemsService {
    * Crée un nouvel item dans la liste, puis lance en tâche de fond
    * la récupération automatisée d'une image.
    */
-  async create(listId: string, dto: CreateItemDto & { lang: string }) {
+  async create(listId: string, user: User, dto: CreateItemDto & { lang: string }) {
     // 1) Traduction en anglais
     const englishName = await this.translate.toEnglish(dto.name, dto.lang);
 
     // 2) Créer l’item en base avec englishName
     const item = this.repo.create({
-      list: await this.listsService.findOne(listId, dto['user']),
+      list: await this.listsService.findOne(listId, user),
       name: englishName,
       rank: dto.rank,
       // pas dto.name
@@ -88,9 +89,15 @@ export class ItemsService {
   /**
    * Met à jour un item existant.
    */
-  async update(listId: string, itemId: string, dto: UpdateItemDto & { lang: string, user?: any }) {
+  async update(
+    listId: string,
+    itemId: string,
+    user: User,
+    dto: UpdateItemDto & { lang: string },
+  ) {
     const item = await this.repo.findOne({
-      where: { id: itemId, list: { id: listId } },
+      where: { id: itemId, list: { id: listId, user } },
+      relations: ['list'],
     });
     if (!item) {
       throw new NotFoundException('Élément non trouvé');
@@ -113,9 +120,10 @@ export class ItemsService {
   /**
    * Supprime un item.
    */
-  async remove(listId: string, itemId: string) {
+  async remove(listId: string, itemId: string, user: User) {
     const item = await this.repo.findOne({
-      where: { id: itemId, list: { id: listId } },
+      where: { id: itemId, list: { id: listId, user } },
+      relations: ['list'],
     });
     if (!item) {
       throw new NotFoundException('Élément non trouvé');

@@ -2,13 +2,8 @@
 
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard }                     from '../auth/jwt-auth.guard';
-import { ValidationService }                from './validation.service';
-
-class ValidateDto {
-  category: string;
-  items: { rank: number; name: string }[];
-  lang: string;
-}
+import { ValidationService } from './validation.service';
+import { ValidateDto } from './dto/validate.dto';
 
 @Controller('validate')
 @UseGuards(JwtAuthGuard)

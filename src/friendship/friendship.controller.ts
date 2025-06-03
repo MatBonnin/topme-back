@@ -2,6 +2,7 @@ import { Controller, Post, Body, Param, Delete, Get, UseGuards, Req } from '@nes
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { FriendshipService } from './friendship.service';
 import { UsersService } from '../users/users.service';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 @UseGuards(JwtAuthGuard)
 @Controller('friendship')
@@ -12,7 +13,7 @@ export class FriendshipController {
   ) {}
 
   @Post('request/:userId')
-  async sendRequest(@Req() req, @Param('userId') userId: string) {
+  async sendRequest(@Req() req: RequestWithUser, @Param('userId') userId: string) {
     const addressee = await this.usersService.findById(userId);
     if (!addressee) {
       throw new Error('Utilisateur destinataire introuvable');
@@ -21,32 +22,32 @@ export class FriendshipController {
   }
 
   @Post('accept/:friendshipId')
-  async acceptRequest(@Req() req, @Param('friendshipId') friendshipId: string) {
+  async acceptRequest(@Req() req: RequestWithUser, @Param('friendshipId') friendshipId: string) {
     return this.friendshipService.acceptRequest(friendshipId, req.user);
   }
 
   @Post('reject/:friendshipId')
-  async rejectRequest(@Req() req, @Param('friendshipId') friendshipId: string) {
+  async rejectRequest(@Req() req: RequestWithUser, @Param('friendshipId') friendshipId: string) {
     return this.friendshipService.rejectRequest(friendshipId, req.user);
   }
 
   @Delete(':friendId')
-  async removeFriend(@Req() req, @Param('friendId') friendId: string) {
+  async removeFriend(@Req() req: RequestWithUser, @Param('friendId') friendId: string) {
     return this.friendshipService.removeFriend(req.user, friendId);
   }
 
   @Get('friends')
-  async getFriends(@Req() req) {
+  async getFriends(@Req() req: RequestWithUser) {
     return this.friendshipService.getFriends(req.user);
   }
 
   @Get('pending')
-  async getPendingRequests(@Req() req) {
+  async getPendingRequests(@Req() req: RequestWithUser) {
     return this.friendshipService.getPendingRequests(req.user);
   }
 
   @Get('sent')
-  async getSentRequests(@Req() req) {
+  async getSentRequests(@Req() req: RequestWithUser) {
     return this.friendshipService.getSentRequests(req.user);
   }
 }
